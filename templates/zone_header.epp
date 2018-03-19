@@ -1,0 +1,15 @@
+; File managed by Puppet
+$ORIGIN	<%= $zone %>.
+$TTL	<%= $zone_ttl %>
+@				IN	SOA	<%= $soa_mname %>. <%= $soa_email %>. (
+                                        <%= $serial %>	; serial
+                                        <%= $soa_refresh %>		; refresh
+                                        <%= $soa_retry %>		; retry
+                                        <%= $soa_expire %>		; expire
+                                        <%= $soa_minimum %>		; minimum
+                                )
+
+<% $nameservers.each |String $nameserver| { -%>
+@		<%= $nameservers_ttl %> IN	NS	<%= $nameserver %>.
+<% } -%>
+

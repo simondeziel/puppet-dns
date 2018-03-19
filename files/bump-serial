@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# File managed by Puppet
+
+# Author: Simon Deziel
+
+set -u
+set -e
+
+SRC="$1"
+DST="$2"
+
+if [ ! -e "$SRC" ]; then
+  echo "The source $SRC does not exist, aborting." >&2
+  exit 1
+fi
+
+# extract the old serial if possible
+if [ -e "$DST" ]; then
+  old_serial="$(sed -n '/serial$/ s/^[^0-9]*\([0-9]\+\).*serial$/\1/p' "$DST")"
+else
+  old_serial=""
+fi
+
+# create a fresh serial
+new_serial="$(date +%Y%m%d00)"
+
+# serial from the source could be higher than the fresh one
+src_serial="$(sed -n '/serial$/ s/^[^0-9]*\([0-9]\+\).*serial$/\1/p' "$SRC")"
+if [ -n "$src_serial" ]; then
+  if [ "$new_serial" -le "$src_serial" ]; then
+    new_serial="$src_serial"
+  fi
+fi
+
+if [ -n "$old_serial" ]; then
+  # if the old serial is higher
+  # increment the old one and use it
+  if [ "$new_serial" -le "$old_serial" ]; then
+    new_serial="$(($old_serial + 1))"
+  fi
+  echo "Bumping serial of $DST from $old_serial to $new_serial"
+else
+  echo "Setting new serial of $DST to $new_serial"
+fi
+
+# proceed to copying the zone while updating the serial
+exec sed "1,/serial$/ s/^\([^0-9]*\)[0-9]\+\(.*serial\)$/\1$new_serial\2/" "$SRC" > "$DST"
