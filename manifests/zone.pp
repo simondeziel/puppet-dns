@@ -79,6 +79,11 @@ define dns::zone (
                                                        },
                                                      }),
     }
+    dns::data { "${zone}-trailer":
+      zone    => $zone,
+      order   => 'zzzz',
+      content => "\n",
+    }
 
     if $collect_exported {
       Dns::Data <<| zone == $name |>>

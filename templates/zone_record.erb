@@ -42,5 +42,5 @@ if %w[TXT SPF].include?(@real_type)
   data_item = data_item.unpack('a255' * ((data_item.length / 255.0).ceil())).collect { |x| '"' + x.gsub(/([\\"])/, '\\\\\\1') + '"' }.join(' ')
 end
 -%>
-<%= @host %>	<%= @ttl %>	IN	<%= @real_type %>	<%= data_item %>
+<%= @host %>	<%= @ttl %>	IN	<%= @real_type %>	<%= data_item -%>
 <% end -%>
