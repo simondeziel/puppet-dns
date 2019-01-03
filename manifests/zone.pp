@@ -58,26 +58,27 @@ define dns::zone (
       notify => Exec["bump ${zone} serial"],
     }
 
+    # special handling for cosmetic alignment
+    $_nameservers_ttl = $nameservers_ttl ? {
+      undef   => "\t",
+      default => $nameservers_ttl,
+    }
     dns::data { "${zone}-header":
       zone    => $zone,
       order   => '01',
       content => epp("${module_name}/zone_header.epp", {
-                                                       'zone'            => $zone,
-                                                       'zone_ttl'        => $zone_ttl,
-                                                       'soa_mname'       => $soa_mname,
-                                                       'soa_email'       => $soa_email,
-                                                       'serial'          => $serial,
-                                                       'soa_refresh'     => $soa_refresh,
-                                                       'soa_retry'       => $soa_retry,
-                                                       'soa_expire'      => $soa_expire,
-                                                       'soa_minimum'     => $soa_minimum,
-                                                       'nameservers'     => $nameservers,
-                                                       # special handling for cosmetic alignment
-                                                       'nameservers_ttl' => $nameservers_ttl ? {
-                                                          undef   => "\t",
-                                                          default => $nameservers_ttl,
-                                                       },
-                                                     }),
+          'zone'            => $zone,
+          'zone_ttl'        => $zone_ttl,
+          'soa_mname'       => $soa_mname,
+          'soa_email'       => $soa_email,
+          'serial'          => $serial,
+          'soa_refresh'     => $soa_refresh,
+          'soa_retry'       => $soa_retry,
+          'soa_expire'      => $soa_expire,
+          'soa_minimum'     => $soa_minimum,
+          'nameservers'     => $nameservers,
+          'nameservers_ttl' => $_nameservers_ttl,
+      }),
     }
     dns::data { "${zone}-trailer":
       zone    => $zone,

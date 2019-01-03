@@ -5,8 +5,8 @@
 define dns::record (
   String $zone,
   String $host,
-  Optional[String] $type              = undef,
   String $data,
+  Optional[String] $type              = undef,
   Optional[String] $ttl               = undef,
   String $order                       = '20',
 ) {
